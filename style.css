@@ -1,0 +1,57 @@
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
+#map {
+  height: 100vh; /* Viewport Height: makes the map take the full height of the viewport */
+  width: 100vw;  /* Viewport Width: makes the map take the full width of the viewport */
+}
+
+#inputForm {
+  position: absolute; /* Position the form absolutely */
+  top: 75px;    /* Distance from the top of the map */
+  left: 10px;   /* Distance from the left of the map */
+  background: rgba(255, 255, 255, 0.8); /* Optional: white background with some opacity */
+  padding: 15px; /* Optional: some padding inside the form */
+  border-radius: 8px; /* Optional: rounded corners */
+  z-index: 1000; /* Ensure the form is above the map */
+}
+
+.leaflet-tooltip {
+  background-color: transparent;
+  border: none;
+  box-shadow: none;
+  font-size: 14px; /* Adjust as needed */
+}
+
+.zone-label {
+  background-color: rgba(255, 255, 255, 0.8);
+  border: 1px solid #222;
+  border-radius: 3px;
+  color: #333;
+  font-size: 12px;
+  text-align: center;
+}
+
+/* Rest of your styles */
+/* #map {
+  height: 600px;
+  border: 1px solid black;
+}
+#inputForm {
+  display: block;
+  margin-top: 20px;
+}
+.form-group {
+  margin-bottom: 10px;
+}
+label {
+  display: inline-block;
+  width: 150px;
+  text-align: right;
+  margin-right: 10px;
+}
+select, input {
+  width: 150px;
+} */

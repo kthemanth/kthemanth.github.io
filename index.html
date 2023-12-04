@@ -5,58 +5,196 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <style>
-        #map { height: 600px; }
-    </style>
+      #map {
+          height: 600px;
+          border: 1px solid black;
+      }
+      #inputForm {
+          display: block;
+          margin-top: 20px;
+      }
+      .form-group {
+          margin-bottom: 10px;
+      }
+      label {
+          display: inline-block;
+          width: 150px;
+          text-align: right;
+          margin-right: 10px;
+      }
+      select, input {
+          width: 150px;
+      }
+  </style>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div id="map"></div>
 
-    <div id="inputForm" style="display:none;">
-        <form>
+    <div id="inputForm">
+      <form>
+        <div class="form-group">
             <label for="year">Year:</label>
-            <input type="number" id="year" name="year"><br><br>
-            <label for="rooms">Number of Rooms:</label>
-            <input type="number" id="rooms" name="rooms"><br><br>
+            <select id="year" name="year">
+                <!-- Year options will be populated here -->
+            </select><br><br>
+        </div>
+        <div class="form-group">
             <label for="storeyRange">Storey Range:</label>
-            <input type="text" id="storeyRange" name="storeyRange"><br><br>
-            <label for="floorArea">Floor Area:</label>
-            <input type="text" id="floorArea" name="floorArea"><br><br>
-            <input type="submit" value="Predict Price">
-        </form>
+            <select id="storeyRange" name="storeyRange">
+                <!-- Storey range options -->
+            </select><br><br>
+        </div>
+        <div class="form-group">
+            <label for="flatType">Flat Type:</label>
+            <select id="flatType" name="flatType">
+                <!-- Flat type options -->
+            </select><br><br>
+        </div>
+        <div class="form-group">
+          <label for="floorArea">Floor Area:</label>
+          <select id="floorArea" name="floorArea">
+              <!-- Floor area options will be populated here -->
+          </select><br><br>
+        </div>
+        <input type="submit" value="Predict Price">
+    </form>
     </div>
+
+    <script src="zones.js"></script>
 
     <script>
         var map = L.map('map').setView([1.3521, 103.8198], 12); // Coordinates of Singapore
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 18,
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png', {
+            maxZoom: 19 ,
         }).addTo(map);
 
-        var tampinesBoundary = L.polygon([
-            // Array of coordinates for Tampines boundary
-        ], {color: 'red'}).addTo(map);
 
-        tampinesBoundary.on('mouseover', function (e) {
-            this.setStyle({color: 'blue'}); // Change color on mouseover
+        var southWest = L.latLng(1.217, 103.603), // These coordinates might need adjustment
+        northEast = L.latLng(1.470, 104.0);
+        var bounds = L.latLngBounds(southWest, northEast);
+        map.setMaxBounds(bounds);
+        map.on('drag', function() {
+            map.panInsideBounds(bounds, { animate: false });
         });
 
-        tampinesBoundary.on('mouseout', function (e) {
-            this.setStyle({color: 'red'}); // Revert color on mouseout
-        });
 
-        tampinesBoundary.on('click', function (e) {
-            // Display input form
-            document.getElementById('inputForm').style.display = 'block';
-        });
+        for (var zoneName in zones) {
+        if (zones.hasOwnProperty(zoneName)) {
+            // Create a polygon for the current zone
+            var zoneBoundary = L.polygon(zones[zoneName], {color: 'red'}).addTo(map);
 
-        document.getElementById('inputForm').addEventListener('submit', function(e){
+            // Bind a tooltip with the zone name (centralized in the polygon)
+            zoneBoundary.bindTooltip(zoneName, {
+                permanent: true,
+                direction: 'center',
+                className: 'zone-label' // CSS class for styling
+            }).openTooltip();
+
+            // Event listeners for the polygon
+            zoneBoundary.on('mouseover', function (e) {
+                this.setStyle({color: 'blue'});
+            });
+            zoneBoundary.on('mouseout', function (e) {
+                this.setStyle({color: 'red'});
+            });
+            zoneBoundary.on('click', function (e) {
+                document.getElementById('inputForm').style.display = 'block';
+            });
+        }
+    }
+
+        document.getElementById('inputForm').addEventListener('submit', async function(e){
         e.preventDefault();
+
+        // Get user input values
         var year = document.getElementById('year').value;
         var rooms = document.getElementById('rooms').value;
         var storeyRange = document.getElementById('storeyRange').value;
         var floorArea = document.getElementById('floorArea').value;
 
-    // Use these values to predict prices (possibly using an API)
-});
+        // Prepare data for API call
+        var data = {
+            year: year,
+            rooms: rooms,
+            storeyRange: storeyRange,
+            floorArea: floorArea
+        };
+
+        try {
+            // Call the API
+            var response = await fetch('YOUR_API_ENDPOINT', {
+                method: 'POST', // or 'GET', depending on your API
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            // Get the prediction result
+            var result = await response.json();
+
+            // Display the result
+            displayPrediction(result.predictedPrice); // Assuming 'predictedPrice' is a field in your response
+
+        } catch (error) {
+            console.error('Error during API call:', error);
+        }
+    });
+
+    function displayPrediction(price) {
+        // Create or update an element to display the price
+        var resultDiv = document.getElementById('result');
+        if (!resultDiv) {
+            resultDiv = document.createElement('div');
+            resultDiv.id = 'result';
+            document.body.appendChild(resultDiv);
+        }
+        resultDiv.innerHTML = `Predicted Price: ${price}`;
+    }
+
+    var yearSelect = document.getElementById('year');
+    for (var i = 2024; i <= 2054; i++) {
+        var option = document.createElement('option');
+        option.value = i;
+        option.text = i;
+        yearSelect.appendChild(option);
+    }
+
+    var storeyRanges = ["01 - 03", "01 - 05", "04 - 06", "06 - 10", "07 - 09", "10 - 12",
+                    "11 - 15", "13 - 15", "16 - 18", "16 - 20", "19 - 21", "21 - 25",
+                    "22 - 24", "25 - 27", "26 - 30", "28 - 30", "31 - 33", "31 - 35",
+                    "34 - 36", "36 - 40", "37 - 39", "40 - 42", "43 - 45", "46 - 48", "49 - 51"];
+
+    var storeyRangeSelect = document.getElementById('storeyRange');
+    storeyRanges.forEach(function(range) {
+        var option = document.createElement('option');
+        option.value = range;
+        option.text = range;
+        storeyRangeSelect.appendChild(option);
+    });
+
+    var flatTypes = ["1 ROOM", "2 ROOM", "3 ROOM", "4 ROOM", "5 ROOM", "EXECUTIVE", "MULTI_GEN"];
+    var flatTypeSelect = document.getElementById('flatType');
+    flatTypes.forEach(function(type) {
+        var option = document.createElement('option');
+        option.value = type;
+        option.text = type;
+        flatTypeSelect.appendChild(option);
+    });
+
+    var floorAreaSelect = document.getElementById('floorArea');
+    for (var i = 30; i <= 310; i += 10) { // Adjust the increment if needed
+        var option = document.createElement('option');
+        option.value = i;
+        option.text = i + ' sqm'; // Display text with 'sqm' for clarity
+        floorAreaSelect.appendChild(option);
+    }
+
     </script>
 </body>
 </html>
