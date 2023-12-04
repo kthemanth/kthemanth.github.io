@@ -1,1 +1,62 @@
-Hello World
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Singapore HDB Price Predictor</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <style>
+        #map { height: 600px; }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+
+    <div id="inputForm" style="display:none;">
+        <form>
+            <label for="year">Year:</label>
+            <input type="number" id="year" name="year"><br><br>
+            <label for="rooms">Number of Rooms:</label>
+            <input type="number" id="rooms" name="rooms"><br><br>
+            <label for="storeyRange">Storey Range:</label>
+            <input type="text" id="storeyRange" name="storeyRange"><br><br>
+            <label for="floorArea">Floor Area:</label>
+            <input type="text" id="floorArea" name="floorArea"><br><br>
+            <input type="submit" value="Predict Price">
+        </form>
+    </div>
+
+    <script>
+        var map = L.map('map').setView([1.3521, 103.8198], 12); // Coordinates of Singapore
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 18,
+        }).addTo(map);
+
+        var tampinesBoundary = L.polygon([
+            // Array of coordinates for Tampines boundary
+        ], {color: 'red'}).addTo(map);
+
+        tampinesBoundary.on('mouseover', function (e) {
+            this.setStyle({color: 'blue'}); // Change color on mouseover
+        });
+
+        tampinesBoundary.on('mouseout', function (e) {
+            this.setStyle({color: 'red'}); // Revert color on mouseout
+        });
+
+        tampinesBoundary.on('click', function (e) {
+            // Display input form
+            document.getElementById('inputForm').style.display = 'block';
+        });
+
+        document.getElementById('inputForm').addEventListener('submit', function(e){
+        e.preventDefault();
+        var year = document.getElementById('year').value;
+        var rooms = document.getElementById('rooms').value;
+        var storeyRange = document.getElementById('storeyRange').value;
+        var floorArea = document.getElementById('floorArea').value;
+
+    // Use these values to predict prices (possibly using an API)
+});
+    </script>
+</body>
+</html>
