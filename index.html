@@ -4,28 +4,6 @@
     <title>Singapore HDB Price Predictor</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-    <style>
-      #map {
-          height: 600px;
-          border: 1px solid black;
-      }
-      #inputForm {
-          display: block;
-          margin-top: 20px;
-      }
-      .form-group {
-          margin-bottom: 10px;
-      }
-      label {
-          display: inline-block;
-          width: 150px;
-          text-align: right;
-          margin-right: 10px;
-      }
-      select, input {
-          width: 150px;
-      }
-  </style>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -57,13 +35,18 @@
               <!-- Floor area options will be populated here -->
           </select><br><br>
         </div>
-        <input type="submit" value="Predict Price">
+        <input id="predictButton" type="submit" value="Predict Price" class="center-button">
+        <button id="showBlueMarkersBtn">Show HDBs</button>
     </form>
     </div>
 
     <script src="zones.js"></script>
+    <script src="hdbLocations.js"></script>
 
     <script>
+        var blueMarkers = [];
+        var markersVisible = false;
+
         var map = L.map('map').setView([1.3521, 103.8198], 12); // Coordinates of Singapore
         L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png', {
             maxZoom: 19 ,
@@ -103,6 +86,47 @@
             });
         }
     }
+
+          function toggleMarkers() {
+          if (!markersVisible) {
+              if (blueMarkers.length === 0) {
+                  // Add markers only if they haven't been added before
+                  mapPoints.forEach(function(point) {
+                      var lat = parseFloat(point.latitude);
+                      var lon = parseFloat(point.longitude);
+
+                      var marker = L.circleMarker([lat, lon], {
+                          className: 'transparent-marker',
+                          color: 'blue',
+                          fillColor: '#30f',
+                          fillOpacity: 0.5,
+                          radius: 5
+                      }).addTo(map);
+
+                      blueMarkers.push(marker); // Store the marker
+                  });
+              } else {
+                  // If markers already exist, simply show them
+                  blueMarkers.forEach(function(marker) {
+                      marker.addTo(map);
+                  });
+              }
+              markersVisible = true;
+              document.getElementById('showBlueMarkersBtn').innerText = 'Hide Blue Markers';
+          } else {
+              // Hide the markers
+              blueMarkers.forEach(function(marker) {
+                  map.removeLayer(marker);
+              });
+              markersVisible = false;
+              document.getElementById('showBlueMarkersBtn').innerText = 'Show Blue Markers';
+          }
+        }
+
+        document.getElementById('showBlueMarkersBtn').addEventListener('click', function(e) {
+        e.preventDefault();
+        toggleMarkers();
+    });
 
         document.getElementById('inputForm').addEventListener('submit', async function(e){
         e.preventDefault();
@@ -178,7 +202,7 @@
         storeyRangeSelect.appendChild(option);
     });
 
-    var flatTypes = ["1 ROOM", "2 ROOM", "3 ROOM", "4 ROOM", "5 ROOM", "EXECUTIVE", "MULTI_GEN"];
+    var flatTypes = ["1 Room", "2 Room", "3 Room", "4 Room", "5 Room", "EXECUTIVE", "MULTI_GEN"];
     var flatTypeSelect = document.getElementById('flatType');
     flatTypes.forEach(function(type) {
         var option = document.createElement('option');

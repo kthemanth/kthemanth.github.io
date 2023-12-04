@@ -4,54 +4,87 @@ html, body {
 }
 
 #map {
-  height: 100vh; /* Viewport Height: makes the map take the full height of the viewport */
-  width: 100vw;  /* Viewport Width: makes the map take the full width of the viewport */
+  height: 100vh; /* Viewport Height */
+  width: 100vw;  /* Viewport Width */
+  border: 1px solid black;
 }
 
 #inputForm {
-  position: absolute; /* Position the form absolutely */
-  top: 75px;    /* Distance from the top of the map */
-  left: 10px;   /* Distance from the left of the map */
-  background: rgba(255, 255, 255, 0.8); /* Optional: white background with some opacity */
-  padding: 15px; /* Optional: some padding inside the form */
-  border-radius: 8px; /* Optional: rounded corners */
-  z-index: 1000; /* Ensure the form is above the map */
+  position: absolute;
+  width: 300px;
+  top: 85px;
+  left: 10px;
+  background: rgba(0, 0, 0, 0.8);
+  padding: 15px;
+  border-radius: 8px;
+  z-index: 1000;
+  color: #fff;
+  border: 2px solid #fff;
+  box-shadow: 0 0 25px rgba(255, 0, 0, 0.6), inset 0 0 10px rgba(0, 0, 0, 0.5); */
+}
+
+.form-group {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.form-group label {
+  flex: 0 0 150px; /* Fixed width for labels */
+  text-align: right;
+  margin-right: 10px;
+}
+
+.form-group input, .form-group select {
+  flex: 1; /* Take the remaining space */
+}
+
+#showBlueMarkersBtn {
+  display: block;
+  width: 100%; /* Full width */
+  padding: 8px; /* Some padding for better touch area */
+  margin-top: 10px; /* Spacing from the last form element */
+  background-color: #007bff; /* Example background color */
+  color: white; /* Text color */
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+#predictButton {
+  display: block;
+  width: 100%; /* Full width */
+  padding: 8px; /* Some padding for better touch area */
+  margin-top: 10px; /* Spacing from the last form element */
+  background-color: #007bff; /* Example background color */
+  color: white; /* Text color */
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
 }
 
 .leaflet-tooltip {
   background-color: transparent;
   border: none;
   box-shadow: none;
-  font-size: 14px; /* Adjust as needed */
+  font-size: 14px;
 }
 
 .zone-label {
-  background-color: rgba(255, 255, 255, 0.8);
+  background-color: rgba(0, 0, 0, 0.8);
   border: 1px solid #222;
-  border-radius: 3px;
-  color: #333;
-  font-size: 12px;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 10px;
   text-align: center;
+  padding: 3px;
 }
 
-/* Rest of your styles */
-/* #map {
-  height: 600px;
-  border: 1px solid black;
-}
-#inputForm {
+.center-button {
   display: block;
-  margin-top: 20px;
+  margin: 0 auto;
 }
-.form-group {
-  margin-bottom: 10px;
+
+.transparent-marker {
+  pointer-events: none;
 }
-label {
-  display: inline-block;
-  width: 150px;
-  text-align: right;
-  margin-right: 10px;
-}
-select, input {
-  width: 150px;
-} */
