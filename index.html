@@ -52,6 +52,7 @@
             maxZoom: 19 ,
         }).addTo(map);
 
+        console.log("Map initialized", map);
 
         var southWest = L.latLng(1.217, 103.603), // These coordinates might need adjustment
         northEast = L.latLng(1.470, 104.0);
@@ -87,50 +88,61 @@
         }
     }
 
-          function toggleMarkers() {
-          if (!markersVisible) {
-              if (blueMarkers.length === 0) {
-                  // Add markers only if they haven't been added before
-                  mapPoints.forEach(function(point) {
-                      var lat = parseFloat(point.latitude);
-                      var lon = parseFloat(point.longitude);
+    function toggleMarkers() {
+    if (!markersVisible) {
+        if (blueMarkers.length === 0) {
+            // Add markers only if they haven't been added before
+            mapPoints.forEach(function(point) {
+                var lat = parseFloat(point.latitude);
+                var lon = parseFloat(point.longitude);
 
-                      var marker = L.circleMarker([lat, lon], {
-                          className: 'transparent-marker',
-                          color: 'blue',
-                          fillColor: '#30f',
-                          fillOpacity: 0.5,
-                          radius: 5
-                      }).addTo(map);
+                var marker = L.circleMarker([lat, lon], {
+                    className: 'transparent-marker',
+                    color: 'blue',
+                    fillColor: '#30f',
+                    fillOpacity: 0.5,
+                    radius: 5
+                });
 
-                      blueMarkers.push(marker); // Store the marker
-                  });
-              } else {
-                  // If markers already exist, simply show them
-                  blueMarkers.forEach(function(marker) {
-                      marker.addTo(map);
-                  });
-              }
-              markersVisible = true;
-              document.getElementById('showBlueMarkersBtn').innerText = 'Hide Blue Markers';
-          } else {
-              // Hide the markers
-              blueMarkers.forEach(function(marker) {
-                  map.removeLayer(marker);
-              });
-              markersVisible = false;
-              document.getElementById('showBlueMarkersBtn').innerText = 'Show Blue Markers';
-          }
+                // Bind a popup to the marker
+                marker.bindPopup(point.address);
+
+                marker.addTo(map);
+                blueMarkers.push(marker); // Store the marker
+            });
+        } else {
+            // If markers already exist, simply show them
+            blueMarkers.forEach(function(marker) {
+                marker.addTo(map);
+            });
         }
+        markersVisible = true;
+        document.getElementById('showBlueMarkersBtn').innerText = 'Hide HDBs';
+    } else {
+        // Hide the markers
+        blueMarkers.forEach(function(marker) {
+            map.removeLayer(marker);
+        });
+        markersVisible = false;
+        document.getElementById('showBlueMarkersBtn').innerText = 'Show HDBs';
+    }
+}
 
         document.getElementById('showBlueMarkersBtn').addEventListener('click', function(e) {
         e.preventDefault();
         toggleMarkers();
     });
 
+    map.on('click', function(e) {
+        var lat = e.latlng.lat;  // Latitude of the click
+        var lon = e.latlng.lng;  // Longitude of the click
+
+        // You can then use these coordinates as needed
+        console.log("Clicked at Latitude: " + lat + ", Longitude: " + lon);
+    });
+
         document.getElementById('inputForm').addEventListener('submit', async function(e){
         e.preventDefault();
-
         // Get user input values
         var year = document.getElementById('year').value;
         var rooms = document.getElementById('rooms').value;
@@ -182,7 +194,7 @@
     }
 
     var yearSelect = document.getElementById('year');
-    for (var i = 2024; i <= 2054; i++) {
+    for (var i = 2024; i <= 2033; i++) {
         var option = document.createElement('option');
         option.value = i;
         option.text = i;
@@ -202,7 +214,7 @@
         storeyRangeSelect.appendChild(option);
     });
 
-    var flatTypes = ["1 Room", "2 Room", "3 Room", "4 Room", "5 Room", "EXECUTIVE", "MULTI_GEN"];
+    var flatTypes = ["1 Room", "2 Room", "3 Room", "4 Room", "5 Room", "Executive", "Multi-gen"];
     var flatTypeSelect = document.getElementById('flatType');
     flatTypes.forEach(function(type) {
         var option = document.createElement('option');
